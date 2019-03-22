@@ -14,6 +14,8 @@ app = Flask(__name__)
 
 graph = tf.get_default_graph()
 
+sol_sz = (10,10)
+
 # Load in our model
 model = model_from_json(open("./model.json").read())
 model.load_weights("./model.h5")
@@ -37,16 +39,12 @@ def predict():
 
     img = img.reshape((64,64,1))
 
-    # plt.imshow(img.reshape((64,64)))
-
     with graph.as_default():
-        output = model.predict(img.reshape(1,64,64,1)).reshape((6,6))
-
-    # plt.imshow(output)
+        output = model.predict(img.reshape(1,64,64,1)).reshape(sol_sz)
 
     (yi,xi) = ndimage.center_of_mass(output)
 
-    x,y = (xi / 5, yi / 5)
+    x,y = (xi / (sol_sz[0]-1), yi / (sol_sz[1] - 1))
 
     os.remove(filepath)
 
